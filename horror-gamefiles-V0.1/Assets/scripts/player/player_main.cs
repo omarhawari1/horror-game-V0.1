@@ -18,6 +18,19 @@ public class player_main : MonoBehaviour
     [SerializeField]private LayerMask groundMask;
     [SerializeField]private float uncrouchSpeed;
     [SerializeField]private float crouchSpeed;
+    [SerializeField]private GameObject flashLight;
+    [SerializeField]private Transform playerCamera;
+
+    [Header("Audio:")]
+    [SerializeField]private bool useFootSteps = true;
+
+    [Header("footsteps: ")]
+    [SerializeField]private float baseStepSpeed = 0.5f;
+    [SerializeField]private float sprintStepMultiplier = 0.6f;
+    [SerializeField]private AudioSource footstepSource = default;
+    [SerializeField]private AudioClip[] footstepAudio = default;
+    private float footStepTimer = 0;
+    private float GetCurrentOffset => isSprinting ? baseStepSpeed * sprintStepMultiplier : baseStepSpeed;
 
 
     //private
@@ -26,22 +39,40 @@ public class player_main : MonoBehaviour
     private float horizontal;
     private float vertical;
     private float xRotation = 0f;
-    private Transform playerCamera;
     private Vector3 velocity;
     private bool isGrounded;
+    private bool flashLightState = false;
+    private bool isSprinting;
 
 
     //public
 
     private void Start() 
     {
-        playerCamera = Camera.main.transform;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update() 
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        //flashLight:
+        if(Input.GetKeyDown(KeyCode.F) && flashLightState == false)
+        {
+            flashLight.SetActive(true);
+            flashLightState = true;
+        }
+        else if(Input.GetKeyDown(KeyCode.F) && flashLightState == true)
+        {
+            flashLight.SetActive(false);
+            flashLightState = false;
+        }
+
+        if(useFootSteps)
+        {
+            handle_Footsteps();
+        }
+
         inputs();
         mouseLook();
         gravity();
@@ -58,10 +89,12 @@ public class player_main : MonoBehaviour
         if(Input.GetKey(KeyCode.LeftShift))
         {
             speed = sprintSpeed;
+            isSprinting = true;
         }
         else
         {
             speed = normalSpeed;
+            isSprinting = false;
         }
 
 
@@ -98,6 +131,32 @@ public class player_main : MonoBehaviour
         //rotate y-axis:
         transform.Rotate(Vector3.up * mouseX);
     }
+
+    private void handle_Footsteps()
+    {
+        if(!isGrounded) return;
+        if(horizontal == 0 & vertical == 0) return;
+
+        footStepTimer -= Time.deltaTime;
+
+        if(footStepTimer <= 0)
+        {
+            if(Physics.Raycast(playerCamera.transform.position, Vector3.down, out RaycastHit hit, 3))
+            {
+                switch(hit.collider.tag)
+                {
+                    case "footsteps/Concrete":
+                    footstepSource.PlayOneShot(footstepAudio[Random.Range(0, footstepAudio.Length -1)]);
+                        break;
+                    default:
+                    footstepSource.PlayOneShot(footstepAudio[Random.Range(0, footstepAudio.Length -1)]);
+                        break;
+                }
+            }
+            footStepTimer = GetCurrentOffset;
+        }
+    }
+
     private void inputs()
     {
         mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime;
