@@ -2267,6 +2267,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76bc58d392fbc71439c66542a12d7c40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canUseHeadBob: 1
   mouseSens: 400
   speed: 0
   sprintSpeed: 4
@@ -2293,6 +2294,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8bc94ec6ed537e743b481638bdcd503d, type: 3}
   - {fileID: 8300000, guid: 5a9383dda6cabc047b7a297602e93eb4, type: 3}
   - {fileID: 8300000, guid: e9714160ce34f2b4ab63ff8c27bd68e1, type: 3}
+  walkBobSpeed: 10
+  walkBobAmount: 0.05
+  sprintBobSpeed: 12
+  sprintBobAmount: 0.1
 --- !u!82 &1927648071
 AudioSource:
   m_ObjectHideFlags: 0

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class player_main : MonoBehaviour
 {
+    [Header("functional options: ")]
+    [SerializeField]private bool canUseHeadBob = true;
+
     //SerializeField
     [SerializeField]private float mouseSens;
     [SerializeField]private float speed;
@@ -32,6 +35,15 @@ public class player_main : MonoBehaviour
     private float footStepTimer = 0;
     private float GetCurrentOffset => isSprinting ? baseStepSpeed * sprintStepMultiplier : baseStepSpeed;
 
+    [Header("headBob: ")]
+    [SerializeField]private float walkBobSpeed;
+    [SerializeField]private float walkBobAmount;
+    [SerializeField]private float sprintBobSpeed;
+    [SerializeField]private float sprintBobAmount;
+
+    private float defaultYpos = 0;
+    private float timer;
+
 
     //private
     private float mouseX;
@@ -47,9 +59,10 @@ public class player_main : MonoBehaviour
 
     //public
 
-    private void Start() 
+    private void Awake() 
     {
         Cursor.lockState = CursorLockMode.Locked;
+        defaultYpos = playerCamera.transform.localPosition.y;
     }
 
     private void Update() 
@@ -71,6 +84,10 @@ public class player_main : MonoBehaviour
         if(useFootSteps)
         {
             handle_Footsteps();
+        }
+        if(canUseHeadBob)
+        {
+            handle_headBob();
         }
 
         inputs();
@@ -155,6 +172,18 @@ public class player_main : MonoBehaviour
             }
             footStepTimer = GetCurrentOffset;
         }
+    }
+    private void handle_headBob()
+    {
+        if(!isGrounded) return;
+        if(horizontal == 0 & vertical == 0) return;
+
+        timer += Time.deltaTime * (isSprinting ? sprintBobSpeed : walkBobSpeed);
+        playerCamera.transform.localPosition = new Vector3(
+            playerCamera.transform.localPosition.x, 
+            defaultYpos + Mathf.Sin(timer) * (isSprinting ? sprintBobAmount : walkBobAmount),
+            playerCamera.transform.localPosition.z
+        );
     }
 
     private void inputs()
