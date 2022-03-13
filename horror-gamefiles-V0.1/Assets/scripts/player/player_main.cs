@@ -5,24 +5,34 @@ using UnityEngine;
 public class player_main : MonoBehaviour
 {
     [Header("functional options: ")]
-    [SerializeField]private bool canUseHeadBob = true;
-    [SerializeField]private bool canCrouch = false;
-    [SerializeField]private bool canUseFlashlight = true;
-    [SerializeField]private bool useFootSteps = true;
+    [SerializeField]private bool canUseHeadBob;
+    [SerializeField]private bool canCrouch;
+    [SerializeField]private bool canSprint;
+    [SerializeField]private bool canUseFlashlight;
+    [SerializeField]private bool useFootSteps;
+    [SerializeField]private bool canPause;
 
     [Header("player settings:")]
-    [SerializeField]private float mouseSens;
+    public float mouseXSens;
+    public float mouseYSens;
     [SerializeField]private float normalSpeed;
     [SerializeField]private float sprintSpeed;
     [SerializeField]private float crouchSpeed;
     [SerializeField]private float crouchSize;
     [SerializeField]private float normalSize;
-    [SerializeField]private float uncrouchSize;
+    [SerializeField]private float uncrouchSpeed;
     [SerializeField]private float gravityValue;
+
+    [Header("controls: ")]
+    [SerializeField]private KeyCode K_flashlight;
+    [SerializeField]private KeyCode k_sprint;
+    [SerializeField]private KeyCode k_pause;
 
     [Header("set componenets: ")]
     [SerializeField]private GameObject flashLight;
     [SerializeField]private CharacterController playerController;
+    [SerializeField]private GameObject pauseMenu;
+    [SerializeField]private GameObject settingsMenu;
 
     [Header("footsteps: ")]
     [SerializeField]private float baseStepSpeed;
@@ -51,6 +61,11 @@ public class player_main : MonoBehaviour
     private Transform playerCamera;
     private float speed;
 
+
+    //public
+    [HideInInspector]
+    public bool paused;
+
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -77,11 +92,18 @@ public class player_main : MonoBehaviour
         {
             handle_Flashlight();
         }
-
-        inputs();
-        mouseLook();
+        if(canSprint)
+        {
+            handle_Sprint();
+        }
+        if(canPause)
+        {
+            handle_pauseMenu();
+        }
         gravity();
+        mouseLook();
         movement();
+        inputs();
     }
 
     private void movement()
@@ -89,18 +111,6 @@ public class player_main : MonoBehaviour
         //wasd movement:
         Vector3 move = transform.right * horizontal + transform.forward * vertical;
         playerController.Move(move * speed * Time.deltaTime);
-
-        //sprint:
-        if(Input.GetKey(KeyCode.LeftShift))
-        {
-            speed = sprintSpeed;
-            isSprinting = true;
-        }
-        else
-        {
-            speed = normalSpeed;
-            isSprinting = false;
-        }
 
     }
     private void gravity()
@@ -171,14 +181,28 @@ public class player_main : MonoBehaviour
         }
         else if(!Input.GetKey(KeyCode.LeftControl) && playerController.height >= crouchSize && playerController.height <= normalSize)
         {
-            playerController.height += uncrouchSize;
+            playerController.height += uncrouchSpeed;
             speed = normalSpeed;
+        }
+    }
+    private void handle_Sprint()
+    {
+        //sprint:
+        if(Input.GetKey(k_sprint))
+        {
+            speed = sprintSpeed;
+            isSprinting = true;
+        }
+        else
+        {
+            speed = normalSpeed;
+            isSprinting = false;
         }
     }
     private void handle_Flashlight()
     {
         //flashLight:
-        if(Input.GetKeyDown(KeyCode.F) && flashLightState == false)
+        if(Input.GetKeyDown(K_flashlight) && flashLightState == false)
         {
             flashLight.SetActive(true);
             flashLightState = true;
@@ -189,11 +213,31 @@ public class player_main : MonoBehaviour
             flashLightState = false;
         }
     }
+    private void handle_pauseMenu()
+    {
+        //pause
+        if(Input.GetKeyDown(k_pause) && !paused)
+        {
+            pauseMenu.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Time.timeScale = 0;
+            paused = true;
+        }
+        //unpause
+        else if(Input.GetKeyDown(k_pause) && paused)
+        {
+            pauseMenu.SetActive(false);
+            settingsMenu.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Time.timeScale = 1;
+            paused = false;
+        }
+    }
 
     private void inputs()
     {
-        mouseX = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime;
-        mouseY = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime;
+        mouseX = Input.GetAxis("Mouse X") * mouseXSens * Time.deltaTime;
+        mouseY = Input.GetAxis("Mouse Y") * mouseYSens * Time.deltaTime;
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
     }
