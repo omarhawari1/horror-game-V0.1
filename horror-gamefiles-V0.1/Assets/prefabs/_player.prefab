@@ -225,24 +225,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canUseHeadBob: 1
+  canCrouch: 0
+  canUseFlashlight: 1
+  useFootSteps: 1
   mouseSens: 400
-  speed: 0
-  sprintSpeed: 4
   normalSpeed: 3
-  playerController: {fileID: 7375522969015231498}
+  sprintSpeed: 4
+  crouchSpeed: 1.5
   crouchSize: 0.5
   normalSize: 2.5
+  uncrouchSize: 1
   gravityValue: -10
-  groundCheck: {fileID: 7375522969259897661}
-  groundDistance: 0.5
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 64
-  uncrouchSpeed: 0.025
-  crouchSpeed: 1.5
   flashLight: {fileID: 7375522969401463331}
-  playerCamera: {fileID: 7375522969328712442}
-  useFootSteps: 1
+  playerController: {fileID: 7375522969015231498}
   baseStepSpeed: 0.75
   sprintStepMultiplier: 0.6
   footstepSource: {fileID: 7375522969015231495}

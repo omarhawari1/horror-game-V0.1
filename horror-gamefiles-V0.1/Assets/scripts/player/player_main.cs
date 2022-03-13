@@ -6,34 +6,31 @@ public class player_main : MonoBehaviour
 {
     [Header("functional options: ")]
     [SerializeField]private bool canUseHeadBob = true;
-
-    //SerializeField
-    [SerializeField]private float mouseSens;
-    [SerializeField]private float speed;
-    [SerializeField]private float sprintSpeed;
-    [SerializeField]private float normalSpeed;
-    [SerializeField]private CharacterController playerController;
-    [SerializeField]private float crouchSize;
-    [SerializeField]private float normalSize;
-    [SerializeField]private float gravityValue;
-    [SerializeField]private Transform groundCheck;
-    [SerializeField]private float groundDistance;
-    [SerializeField]private LayerMask groundMask;
-    [SerializeField]private float uncrouchSpeed;
-    [SerializeField]private float crouchSpeed;
-    [SerializeField]private GameObject flashLight;
-    [SerializeField]private Transform playerCamera;
-
-    [Header("Audio:")]
+    [SerializeField]private bool canCrouch = false;
+    [SerializeField]private bool canUseFlashlight = true;
     [SerializeField]private bool useFootSteps = true;
 
+    [Header("player settings:")]
+    [SerializeField]private float mouseSens;
+    [SerializeField]private float normalSpeed;
+    [SerializeField]private float sprintSpeed;
+    [SerializeField]private float crouchSpeed;
+    [SerializeField]private float crouchSize;
+    [SerializeField]private float normalSize;
+    [SerializeField]private float uncrouchSize;
+    [SerializeField]private float gravityValue;
+
+    [Header("set componenets: ")]
+    [SerializeField]private GameObject flashLight;
+    [SerializeField]private CharacterController playerController;
+
     [Header("footsteps: ")]
-    [SerializeField]private float baseStepSpeed = 0.5f;
-    [SerializeField]private float sprintStepMultiplier = 0.6f;
+    [SerializeField]private float baseStepSpeed;
+    [SerializeField]private float sprintStepSpeed;
     [SerializeField]private AudioSource footstepSource = default;
     [SerializeField]private AudioClip[] footstepAudio = default;
     private float footStepTimer = 0;
-    private float GetCurrentOffset => isSprinting ? baseStepSpeed * sprintStepMultiplier : baseStepSpeed;
+    private float GetCurrentOffset => isSprinting ? sprintStepSpeed : baseStepSpeed;
 
     [Header("headBob: ")]
     [SerializeField]private float walkBobSpeed;
@@ -43,43 +40,26 @@ public class player_main : MonoBehaviour
 
     private float defaultYpos = 0;
     private float timer;
-
-
-    //private
     private float mouseX;
     private float mouseY;
     private float horizontal;
     private float vertical;
     private float xRotation = 0f;
     private Vector3 velocity;
-    private bool isGrounded;
     private bool flashLightState = false;
     private bool isSprinting;
+    private Transform playerCamera;
+    private float speed;
 
-
-    //public
-
-    private void Awake() 
+    private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        playerCamera = Camera.main.transform;
         defaultYpos = playerCamera.transform.localPosition.y;
     }
 
     private void Update() 
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        //flashLight:
-        if(Input.GetKeyDown(KeyCode.F) && flashLightState == false)
-        {
-            flashLight.SetActive(true);
-            flashLightState = true;
-        }
-        else if(Input.GetKeyDown(KeyCode.F) && flashLightState == true)
-        {
-            flashLight.SetActive(false);
-            flashLightState = false;
-        }
 
         if(useFootSteps)
         {
@@ -88,6 +68,14 @@ public class player_main : MonoBehaviour
         if(canUseHeadBob)
         {
             handle_headBob();
+        }
+        if(canCrouch)
+        {
+            handle_Crouch();
+        }
+        if(canUseFlashlight)
+        {
+            handle_Flashlight();
         }
 
         inputs();
@@ -114,23 +102,11 @@ public class player_main : MonoBehaviour
             isSprinting = false;
         }
 
-
-        //crouch:
-        if(Input.GetKey(KeyCode.LeftControl))
-        {
-            playerController.height = crouchSize;
-            speed = crouchSpeed;
-        }
-        else if(!Input.GetKey(KeyCode.LeftControl) && playerController.height >= crouchSize && playerController.height <= normalSize)
-        {
-            playerController.height += uncrouchSpeed;
-            speed = normalSpeed;
-        }
     }
     private void gravity()
     {
         //gravity
-        if(isGrounded && velocity.y < 0)
+        if(playerController.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
@@ -151,8 +127,8 @@ public class player_main : MonoBehaviour
 
     private void handle_Footsteps()
     {
-        if(!isGrounded) return;
-        if(horizontal == 0 & vertical == 0) return;
+        if(!playerController.isGrounded) return;
+        if(velocity.x == 0 && velocity.y == 0) return;
 
         footStepTimer -= Time.deltaTime;
 
@@ -175,7 +151,7 @@ public class player_main : MonoBehaviour
     }
     private void handle_headBob()
     {
-        if(!isGrounded) return;
+        if(!playerController.isGrounded) return;
         if(horizontal == 0 & vertical == 0) return;
 
         timer += Time.deltaTime * (isSprinting ? sprintBobSpeed : walkBobSpeed);
@@ -184,6 +160,34 @@ public class player_main : MonoBehaviour
             defaultYpos + Mathf.Sin(timer) * (isSprinting ? sprintBobAmount : walkBobAmount),
             playerCamera.transform.localPosition.z
         );
+    }
+    private void handle_Crouch()
+    {
+        //crouch:
+        if(Input.GetKey(KeyCode.LeftControl))
+        {
+            playerController.height = crouchSize;
+            speed = crouchSpeed;
+        }
+        else if(!Input.GetKey(KeyCode.LeftControl) && playerController.height >= crouchSize && playerController.height <= normalSize)
+        {
+            playerController.height += uncrouchSize;
+            speed = normalSpeed;
+        }
+    }
+    private void handle_Flashlight()
+    {
+        //flashLight:
+        if(Input.GetKeyDown(KeyCode.F) && flashLightState == false)
+        {
+            flashLight.SetActive(true);
+            flashLightState = true;
+        }
+        else if(Input.GetKeyDown(KeyCode.F) && flashLightState == true)
+        {
+            flashLight.SetActive(false);
+            flashLightState = false;
+        }
     }
 
     private void inputs()
