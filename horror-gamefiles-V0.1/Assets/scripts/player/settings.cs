@@ -17,7 +17,7 @@ public class settings : MonoBehaviour
     [SerializeField]private TMP_Dropdown resolutionDropdown;
 
     private Resolution[] resolutions;
-    
+
     private void Start()
     {
 

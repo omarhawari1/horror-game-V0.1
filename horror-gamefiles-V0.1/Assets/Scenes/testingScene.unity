@@ -946,6 +946,18 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1483262293, guid: 5e019248b28ee7f4d8a2419e9d74e61e, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1483262293, guid: 5e019248b28ee7f4d8a2419e9d74e61e, type: 3}
+      propertyPath: m_MinValue
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1483262293, guid: 5e019248b28ee7f4d8a2419e9d74e61e, type: 3}
+      propertyPath: m_WholeNumbers
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7375522969015231492, guid: 5e019248b28ee7f4d8a2419e9d74e61e, type: 3}
       propertyPath: m_Name
       value: _player
