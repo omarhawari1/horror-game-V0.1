@@ -17,9 +17,10 @@ public class settings : MonoBehaviour
     [SerializeField]private TMP_Dropdown resolutionDropdown;
 
     private Resolution[] resolutions;
-
-    private void Awake()
+    
+    private void Start()
     {
+
         mouseSenseX.text = mouseSensX_startingValue.ToString();
         mouseSenseY.text = mouseSensY_startingValue.ToString();
 
