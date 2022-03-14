@@ -138,7 +138,7 @@ public class player_main : MonoBehaviour
     private void handle_Footsteps()
     {
         if(!playerController.isGrounded) return;
-        if(velocity.x == 0 && velocity.y == 0) return;
+        if(horizontal == 0 && vertical == 0) return;
 
         footStepTimer -= Time.deltaTime;
 

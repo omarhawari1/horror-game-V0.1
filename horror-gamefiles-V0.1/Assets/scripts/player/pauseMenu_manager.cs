@@ -7,6 +7,7 @@ public class pauseMenu_manager : MonoBehaviour
     [SerializeField]private GameObject pauseMenu;
     [SerializeField]private player_main player_Main;
     [SerializeField]private GameObject settings;
+
     public void resume()
     {
         pauseMenu.SetActive(false);
@@ -18,5 +19,9 @@ public class pauseMenu_manager : MonoBehaviour
     {
         settings.SetActive(true);
         pauseMenu.SetActive(false);
+    }
+    public void exitGame()
+    {
+        Application.Quit();
     }
 }
