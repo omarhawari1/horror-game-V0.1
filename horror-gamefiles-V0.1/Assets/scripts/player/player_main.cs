@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 public class player_main : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class player_main : MonoBehaviour
     [SerializeField]private bool canUseFlashlight;
     [SerializeField]private bool useFootSteps;
     [SerializeField]private bool canPause;
+    [SerializeField]private bool canUseTime;
 
     [Header("player settings:")]
     public float mouseXSens;
@@ -33,6 +36,7 @@ public class player_main : MonoBehaviour
     [SerializeField]private CharacterController playerController;
     [SerializeField]private GameObject pauseMenu;
     [SerializeField]private GameObject settingsMenu;
+    [SerializeField]private TMP_Text time;
 
     [Header("footsteps: ")]
     [SerializeField]private float baseStepSpeed;
@@ -60,6 +64,11 @@ public class player_main : MonoBehaviour
     private bool isSprinting;
     private Transform playerCamera;
     private float speed;
+    private float startTime;
+    private float seconds;
+    private float minutes;
+    private float days;
+    private bool started;
 
 
     //public
@@ -71,6 +80,10 @@ public class player_main : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         playerCamera = Camera.main.transform;
         defaultYpos = playerCamera.transform.localPosition.y;
+
+        //time
+        startTime = Time.time;
+        started = true;
     }
 
     private void Update() 
@@ -99,6 +112,10 @@ public class player_main : MonoBehaviour
         if(canPause)
         {
             handle_pauseMenu();
+        }
+        if(canUseTime && started)
+        {
+            handle_Time();
         }
         gravity();
         mouseLook();
@@ -232,6 +249,23 @@ public class player_main : MonoBehaviour
             Time.timeScale = 1;
             paused = false;
         }
+    }
+    private void handle_Time()
+    {
+        seconds = Time.time - startTime;
+        seconds = Mathf.Round(seconds);
+        if(seconds >= 60)
+        {
+            minutes += 1;
+            seconds = 0;
+            startTime = Time.time;
+        }
+        if(minutes >= 60)
+        {
+            days += 1;
+            minutes = 0;
+        }
+        time.text = days.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00");
     }
 
     private void inputs()
