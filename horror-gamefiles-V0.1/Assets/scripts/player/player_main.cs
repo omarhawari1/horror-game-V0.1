@@ -157,6 +157,7 @@ public class player_main : MonoBehaviour
         if(!playerController.isGrounded) return;
         if(horizontal == 0 && vertical == 0) return;
 
+
         footStepTimer -= Time.deltaTime;
 
         if(footStepTimer <= 0)
